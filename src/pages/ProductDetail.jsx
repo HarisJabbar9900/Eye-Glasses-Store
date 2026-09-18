@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Star, Heart, ShoppingBag, Camera, ShieldCheck, Truck, RefreshCw, 
-  Ruler, Eye, CheckCircle2, Send, RotateCw 
+  Ruler, Eye, CheckCircle2, Send, Sparkles 
 } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { PRODUCTS } from '../data/products';
@@ -16,7 +16,8 @@ export const ProductDetail = () => {
     setArProduct, 
     setPrescriptionProduct,
     setIsSizeGuideOpen,
-    addToast
+    addToast,
+    formatPrice
   } = useStore();
 
   const product = PRODUCTS.find((p) => p.id === selectedProductId) || PRODUCTS[0];
@@ -31,17 +32,17 @@ export const ProductDetail = () => {
   const [reviewsList, setReviewsList] = useState([
     {
       id: 1,
-      name: 'Marcus Sterling',
+      name: 'Hamza Malik',
       date: '2 weeks ago',
       rating: 5,
       comment: 'Exceptional titanium build quality! Extremely lightweight and the anti-reflective lens coating is crystal clear.'
     },
     {
       id: 2,
-      name: 'Clara Oswald',
+      name: 'Ayesha Siddiqui',
       date: '1 month ago',
       rating: 5,
-      comment: 'Fits like a glove. Used the AR camera try-on feature and it was spot on for face sizing.'
+      comment: 'Fits comfortably across the bridge with zero pinching. The optical prescription was spot on.'
     }
   ]);
 
@@ -62,22 +63,32 @@ export const ProductDetail = () => {
       ]);
       setNewComment('');
       setReviewerName('');
-      addToast('Thank you! Your product review has been published.', 'success');
+      addToast('Thank you! Your patron review has been verified.', 'success');
     }
   };
 
-  const [viewMode, setViewMode] = useState('photo'); // 'photo' | '360'
+  const [viewMode, setViewMode] = useState('studio'); // 'photo' | 'studio'
 
   return (
     <div className="py-8 sm:py-14">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Product Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 mb-16 items-start">
-          {/* Gallery Column */}
+          {/* Gallery & Studio Column */}
           <div className="flex flex-col gap-4">
-            {/* View Mode Toggle Bar (Photo Gallery vs 360 Interactive Viewer) */}
+            {/* View Mode Toggle Bar */}
             <div className="flex items-center justify-between bg-slate-900/60 p-1.5 rounded-2xl border border-[var(--border-color)]">
               <div className="flex gap-1">
+                <button
+                  onClick={() => setViewMode('studio')}
+                  className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    viewMode === 'studio'
+                      ? 'bg-[var(--accent-gold)] text-slate-950 shadow-md'
+                      : 'text-[var(--text-secondary)] hover:text-white'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5" /> Studio Loupe Inspector
+                </button>
                 <button
                   onClick={() => setViewMode('photo')}
                   className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
@@ -86,45 +97,35 @@ export const ProductDetail = () => {
                       : 'text-[var(--text-secondary)] hover:text-white'
                   }`}
                 >
-                  High-Res Photos
-                </button>
-                <button
-                  onClick={() => setViewMode('360')}
-                  className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                    viewMode === '360'
-                      ? 'bg-cyan-500 text-slate-950 shadow-md'
-                      : 'text-[var(--text-secondary)] hover:text-white'
-                  }`}
-                >
-                  <RotateCw className="w-3.5 h-3.5" /> 360° Interactive Orbit
+                  Editorial Gallery
                 </button>
               </div>
 
               {product.arStyle && (
                 <button
                   onClick={() => setArProduct(product)}
-                  className="px-3 py-1.5 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 bg-[#d4af37]/15 text-[var(--accent-gold)] hover:bg-[#d4af37]/25 border border-[#d4af37]/30 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
-                  <Camera className="w-3.5 h-3.5" /> AR Mirror
+                  <Camera className="w-3.5 h-3.5" /> Virtual Mirror
                 </button>
               )}
             </div>
 
-            {viewMode === '360' ? (
+            {viewMode === 'studio' ? (
               <FrameViewer360 product={product} activeColor={selectedColor} />
             ) : (
               <>
-                <div className="relative w-full h-[360px] sm:h-[460px] lg:h-[520px] rounded-3xl overflow-hidden bg-[#040710] border border-[var(--border-color)] shadow-xl">
+                <div className="relative w-full h-[360px] sm:h-[460px] lg:h-[520px] rounded-3xl overflow-hidden bg-[#040710] border border-[var(--border-color)] shadow-xl flex items-center justify-center p-6">
                   <img
                     src={gallery[activeImageIndex] || product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover"
+                    className="max-h-full max-w-full object-contain drop-shadow-2xl"
                   />
 
                   {/* Wishlist Heart */}
                   <button
                     onClick={() => toggleWishlist(product)}
-                    className={`btn-icon absolute top-4 right-4 z-10 w-11 h-11 backdrop-blur-md ${
+                    className={`btn-icon absolute top-4 right-4 z-10 w-11 h-11 backdrop-blur-md rounded-xl ${
                       isWish ? 'border-rose-500 bg-rose-500/10' : 'bg-slate-900/60 border-white/20'
                     }`}
                   >
@@ -139,11 +140,11 @@ export const ProductDetail = () => {
                       <div
                         key={idx}
                         onClick={() => setActiveImageIndex(idx)}
-                        className={`w-20 h-20 rounded-2xl overflow-hidden cursor-pointer shrink-0 border transition-all ${
+                        className={`w-20 h-20 rounded-2xl overflow-hidden cursor-pointer shrink-0 border transition-all p-1 bg-black/40 ${
                           activeImageIndex === idx ? 'border-2 border-[#d4af37] shadow-md scale-105' : 'border-[var(--border-color)] opacity-70 hover:opacity-100'
                         }`}
                       >
-                        <img src={img} alt="Thumb" className="w-full h-full object-cover" />
+                        <img src={img} alt="Thumb" className="w-full h-full object-contain" />
                       </div>
                     ))}
                   </div>
@@ -155,7 +156,7 @@ export const ProductDetail = () => {
           {/* Details Column */}
           <div className="flex flex-col gap-6">
             <div>
-              <span className="badge-gold text-xs">
+              <span className="badge-gold text-xs uppercase tracking-wider">
                 {product.gender} • {product.frameShape} • {product.material}
               </span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--text-primary)] mt-3 mb-2 font-serif">
@@ -169,20 +170,20 @@ export const ProductDetail = () => {
             {/* Rating */}
             <div className="flex items-center gap-2.5">
               <div className="flex text-amber-400">
-                <Star className="w-5 h-5 fill-amber-400" />
+                <Star className="w-4 h-4 fill-amber-400" />
               </div>
-              <span className="text-base font-bold text-[var(--text-primary)]">{product.rating}</span>
-              <span className="text-sm text-[var(--text-muted)]">({product.reviewsCount} customer reviews)</span>
+              <span className="text-sm font-bold text-[var(--text-primary)]">{product.rating}</span>
+              <span className="text-xs text-[var(--text-muted)]">({product.reviewsCount} verified patron reviews)</span>
             </div>
 
             {/* Price Box */}
             <div className="flex items-baseline gap-3">
-              <span className="text-3xl sm:text-4xl font-extrabold text-[var(--accent-gold)]">
-                Rs. {product.price.toLocaleString()}
+              <span className="text-3xl sm:text-4xl font-bold text-[var(--accent-gold)] font-mono">
+                {formatPrice(product.price)}
               </span>
               {product.originalPrice && (
-                <span className="text-lg text-[var(--text-muted)] line-through">
-                  Rs. {product.originalPrice.toLocaleString()}
+                <span className="text-lg text-[var(--text-muted)] line-through font-mono">
+                  {formatPrice(product.originalPrice)}
                 </span>
               )}
             </div>
@@ -195,8 +196,8 @@ export const ProductDetail = () => {
             {/* Color Selector */}
             {product.colors && (
               <div>
-                <label className="text-sm font-bold text-[var(--text-primary)] block mb-3">
-                  Selected Color Finish: <strong className="text-[var(--accent-gold)]">{selectedColor?.name}</strong>
+                <label className="text-xs font-bold text-[var(--text-primary)] block mb-3 uppercase tracking-wider">
+                  Select Frame Metallurgy / Finish: <strong className="text-[var(--accent-gold)] font-sans">{selectedColor?.name}</strong>
                 </label>
                 <div className="flex gap-3">
                   {product.colors.map((c) => (
@@ -235,9 +236,9 @@ export const ProductDetail = () => {
               {product.arStyle && (
                 <button
                   onClick={() => setArProduct(product)}
-                  className="btn-outline py-3.5 px-6 text-sm text-cyan-400 border-cyan-500/40 hover:bg-cyan-500/10 flex items-center justify-center gap-2 rounded-2xl"
+                  className="btn-outline py-3 px-6 text-sm text-[var(--accent-gold)] border-[#d4af37]/40 hover:bg-[#d4af37]/10 flex items-center justify-center gap-2 rounded-2xl font-semibold"
                 >
-                  <Camera className="w-4 h-4" /> Launch Virtual AR Fitting Mirror
+                  <Camera className="w-4 h-4" /> Launch Virtual Fitting Mirror
                 </button>
               )}
 
@@ -245,20 +246,20 @@ export const ProductDetail = () => {
                 onClick={() => setIsSizeGuideOpen(true)}
                 className="text-xs text-[var(--text-muted)] hover:text-[var(--accent-gold)] cursor-pointer flex items-center gap-1.5 justify-center py-2 bg-none border-none font-medium transition-colors"
               >
-                <Ruler className="w-3.5 h-3.5" /> Open Credit Card Frame Sizing Guide
+                <Ruler className="w-3.5 h-3.5" /> View Millimeter Fit &amp; Size Guide
               </button>
             </div>
 
             {/* Value Props Bullet Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-2 p-5 bg-[var(--bg-input)] rounded-2xl text-xs sm:text-sm text-[var(--text-secondary)] border border-[var(--border-color)]">
               <div className="flex items-center gap-2.5">
-                <Truck className="w-4 h-4 text-[var(--accent-gold)] shrink-0" /> Free Express Shipping
+                <Truck className="w-4 h-4 text-[var(--accent-gold)] shrink-0" /> Free White-Glove Shipping
               </div>
               <div className="flex items-center gap-2.5">
-                <RefreshCw className="w-4 h-4 text-cyan-400 shrink-0" /> 30-Day Free Home Trial
+                <RefreshCw className="w-4 h-4 text-emerald-400 shrink-0" /> 30-Day Home Trial Guarantee
               </div>
               <div className="flex items-center gap-2.5">
-                <ShieldCheck className="w-4 h-4 text-[var(--accent-gold)] shrink-0" /> Lifetime Frame Warranty
+                <ShieldCheck className="w-4 h-4 text-[var(--accent-gold)] shrink-0" /> Lifetime Atelier Frame Warranty
               </div>
               <div className="flex items-center gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" /> 100% Prescription Accuracy
@@ -271,29 +272,29 @@ export const ProductDetail = () => {
         {product.specs && (
           <div className="glass-panel p-8 sm:p-10 rounded-3xl mb-14 border border-[var(--border-color)] shadow-lg">
             <h3 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mb-6 font-serif">
-              Optical Frame Specifications
+              Optical Frame Engineering
             </h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
               <div className="p-5 bg-[var(--bg-input)] rounded-2xl border border-[var(--border-color)]">
-                <span className="text-xs text-[var(--text-muted)] block font-bold tracking-wider mb-1">LENS WIDTH</span>
-                <strong className="text-lg sm:text-xl text-[var(--accent-gold)] font-serif">{product.specs.lensWidth}</strong>
+                <span className="text-[10px] text-[var(--text-muted)] block font-bold tracking-wider mb-1 uppercase">LENS WIDTH</span>
+                <strong className="text-lg sm:text-xl text-[var(--accent-gold)] font-mono">{product.specs.lensWidth}</strong>
               </div>
               <div className="p-5 bg-[var(--bg-input)] rounded-2xl border border-[var(--border-color)]">
-                <span className="text-xs text-[var(--text-muted)] block font-bold tracking-wider mb-1">BRIDGE SIZE</span>
-                <strong className="text-lg sm:text-xl text-[var(--accent-gold)] font-serif">{product.specs.bridgeWidth}</strong>
+                <span className="text-[10px] text-[var(--text-muted)] block font-bold tracking-wider mb-1 uppercase">BRIDGE WIDTH</span>
+                <strong className="text-lg sm:text-xl text-[var(--accent-gold)] font-mono">{product.specs.bridgeWidth}</strong>
               </div>
               <div className="p-5 bg-[var(--bg-input)] rounded-2xl border border-[var(--border-color)]">
-                <span className="text-xs text-[var(--text-muted)] block font-bold tracking-wider mb-1">TEMPLE LENGTH</span>
-                <strong className="text-lg sm:text-xl text-[var(--accent-gold)] font-serif">{product.specs.templeLength}</strong>
+                <span className="text-[10px] text-[var(--text-muted)] block font-bold tracking-wider mb-1 uppercase">TEMPLE LENGTH</span>
+                <strong className="text-lg sm:text-xl text-[var(--accent-gold)] font-mono">{product.specs.templeLength}</strong>
               </div>
               <div className="p-5 bg-[var(--bg-input)] rounded-2xl border border-[var(--border-color)]">
-                <span className="text-xs text-[var(--text-muted)] block font-bold tracking-wider mb-1">FRAME MATERIAL</span>
-                <strong className="text-base sm:text-lg text-[var(--text-primary)]">{product.material}</strong>
+                <span className="text-[10px] text-[var(--text-muted)] block font-bold tracking-wider mb-1 uppercase">FRAME METALLURGY</span>
+                <strong className="text-sm sm:text-base text-[var(--text-primary)]">{product.material}</strong>
               </div>
               <div className="p-5 bg-[var(--bg-input)] rounded-2xl border border-[var(--border-color)] col-span-2 sm:col-span-1">
-                <span className="text-xs text-[var(--text-muted)] block font-bold tracking-wider mb-1">FRAME WEIGHT</span>
-                <strong className="text-base sm:text-lg text-[var(--text-primary)]">{product.weight}</strong>
+                <span className="text-[10px] text-[var(--text-muted)] block font-bold tracking-wider mb-1 uppercase">FRAME WEIGHT</span>
+                <strong className="text-sm sm:text-base text-emerald-400 font-mono">{product.weight}</strong>
               </div>
             </div>
           </div>
@@ -302,19 +303,19 @@ export const ProductDetail = () => {
         {/* Reviews Section */}
         <div className="glass-panel p-8 sm:p-10 rounded-3xl border border-[var(--border-color)] shadow-lg">
           <h3 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mb-8 font-serif">
-            Customer Reviews &amp; Ratings ({reviewsList.length})
+            Patron Reviews &amp; Optical Ratings ({reviewsList.length})
           </h3>
 
           {/* Add Review Form */}
           <form onSubmit={handleAddReview} className="mb-10 p-6 sm:p-8 bg-[var(--bg-input)] rounded-2xl border border-[var(--border-color)] shadow-sm">
             <h4 className="text-base font-bold text-[var(--text-primary)] mb-4 font-serif">
-              Write a Verified Customer Review
+              Submit a Verified Patron Review
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="text-xs text-[var(--text-muted)] block mb-1 font-medium">Your Name</label>
-                <input required value={reviewerName} onChange={(e) => setReviewerName(e.target.value)} className="input-field py-2.5 text-xs sm:text-sm" placeholder="e.g. Sarah Jenkins" />
+                <input required value={reviewerName} onChange={(e) => setReviewerName(e.target.value)} className="input-field py-2.5 text-xs sm:text-sm" placeholder="e.g. Harris Malik" />
               </div>
               <div>
                 <label className="text-xs text-[var(--text-muted)] block mb-1 font-medium">Rating</label>
@@ -349,7 +350,7 @@ export const ProductDetail = () => {
                     <Star key={i} className="w-4 h-4 fill-amber-400" />
                   ))}
                 </div>
-                <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
+                <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
                   {rev.comment}
                 </p>
               </div>
@@ -360,4 +361,3 @@ export const ProductDetail = () => {
     </div>
   );
 };
-

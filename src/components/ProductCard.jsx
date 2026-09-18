@@ -10,7 +10,8 @@ export const ProductCard = ({ product }) => {
     addToCart, 
     setQuickViewProduct, 
     setArProduct,
-    setPrescriptionProduct
+    setPrescriptionProduct,
+    formatPrice
   } = useStore();
 
   const [selectedColor, setSelectedColor] = useState(
@@ -22,31 +23,30 @@ export const ProductCard = ({ product }) => {
   return (
     <div className="glass-panel rounded-3xl overflow-hidden transition-all duration-300 flex flex-col relative group hover:-translate-y-1.5 border border-[var(--border-color)] hover:border-[#d4af37]/60 shadow-lg hover:shadow-2xl hover:shadow-[#d4af37]/10">
       {/* Product Image Box & Badges */}
-      <div className="relative w-full h-64 sm:h-72 overflow-hidden bg-[#050810]">
+      <div className="relative w-full h-64 sm:h-72 overflow-hidden bg-[#050810] flex items-center justify-center p-4">
         <img
           src={product.image}
           alt={product.name}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover transition-transform duration-500 cursor-pointer group-hover:scale-105"
+          className="max-h-full max-w-full object-contain transition-transform duration-500 cursor-pointer group-hover:scale-105 drop-shadow-md"
           onClick={() => navigateTo('product-detail', product.id)}
         />
-
 
         {/* Top Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
           {product.discountPercent && (
-            <span className="bg-rose-500 text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-md">
-              -{product.discountPercent}% OFF
+            <span className="bg-rose-500 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold shadow-md">
+              -{product.discountPercent}%
             </span>
           )}
           {product.isNew && (
-            <span className="bg-cyan-400 text-slate-950 px-2.5 py-0.5 rounded-full text-xs font-bold shadow-md">
-              NEW
+            <span className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold shadow-md">
+              NEW RELEASE
             </span>
           )}
           {product.isBestseller && (
-            <span className="bg-[#d4af37] text-slate-950 px-2.5 py-0.5 rounded-full text-xs font-bold shadow-md">
+            <span className="bg-[#d4af37] text-slate-950 px-2.5 py-0.5 rounded-full text-[10px] font-bold shadow-md">
               BESTSELLER
             </span>
           )}
@@ -58,7 +58,7 @@ export const ProductCard = ({ product }) => {
             e.stopPropagation();
             toggleWishlist(product);
           }}
-          className={`btn-icon absolute top-3 right-3 z-10 w-9 h-9 sm:w-10 sm:h-10 backdrop-blur-md transition-transform active:scale-95 ${
+          className={`btn-icon absolute top-3 right-3 z-10 w-9 h-9 sm:w-10 sm:h-10 backdrop-blur-md transition-transform active:scale-95 rounded-xl ${
             isWish ? 'border-rose-500 bg-rose-500/20' : 'bg-slate-900/60 border-white/20'
           }`}
           title={isWish ? 'Remove from wishlist' : 'Add to wishlist'}
@@ -66,19 +66,17 @@ export const ProductCard = ({ product }) => {
           <Heart className={`w-4 h-4 ${isWish ? 'text-rose-500 fill-rose-500' : 'text-white'}`} />
         </button>
 
-        {/* Quick View & AR Action Buttons Bar */}
+        {/* Quick View & Virtual Mirror Actions */}
         <div className="absolute bottom-3 left-3 right-3 flex gap-2 z-10 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 transform sm:translate-y-2 sm:group-hover:translate-y-0">
-          {product.arStyle && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setArProduct(product);
-              }}
-              className="flex-1 py-2 px-3 bg-cyan-500/90 hover:bg-cyan-400 backdrop-blur-md rounded-xl text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-lg"
-            >
-              <Camera className="w-3.5 h-3.5" /> AR Fit
-            </button>
-          )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setArProduct(product);
+            }}
+            className="flex-1 py-2 px-3 bg-[#d4af37] hover:bg-[#c5a880] backdrop-blur-md rounded-xl text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-lg"
+          >
+            <Camera className="w-3.5 h-3.5" /> Mirror
+          </button>
 
           <button
             onClick={(e) => {
@@ -86,9 +84,9 @@ export const ProductCard = ({ product }) => {
               setQuickViewProduct(product);
             }}
             className="flex-1 py-2 px-3 bg-slate-900/90 hover:bg-slate-800 backdrop-blur-md border border-white/20 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-lg"
-            title="Quick view product"
+            title="Inspect frame"
           >
-            <Eye className="w-3.5 h-3.5" /> Quick View
+            <Eye className="w-3.5 h-3.5" /> Inspect
           </button>
         </div>
       </div>
@@ -99,7 +97,7 @@ export const ProductCard = ({ product }) => {
           {/* Gender / Material Tag */}
           <div className="flex justify-between items-center mb-2 text-xs text-[var(--text-muted)] font-medium">
             <span>{product.gender} • {product.frameShape}</span>
-            <span>{product.material}</span>
+            <span className="text-[var(--accent-gold)] font-mono text-[11px]">{product.material}</span>
           </div>
 
           {/* Title */}
@@ -113,13 +111,13 @@ export const ProductCard = ({ product }) => {
           {/* Rating */}
           <div className="flex items-center gap-1.5 mb-3">
             <div className="flex text-amber-400">
-              <Star className="w-4 h-4 fill-amber-400" />
+              <Star className="w-3.5 h-3.5 fill-amber-400" />
             </div>
             <span className="text-xs font-bold text-[var(--text-primary)]">
               {product.rating}
             </span>
             <span className="text-xs text-[var(--text-muted)]">
-              ({product.reviewsCount} reviews)
+              ({product.reviewsCount} verified)
             </span>
           </div>
 
@@ -147,12 +145,12 @@ export const ProductCard = ({ product }) => {
         {/* Price & Cart Actions */}
         <div className="pt-4 border-t border-[var(--border-color)] flex items-center justify-between gap-3">
           <div>
-            <div className="text-lg sm:text-xl font-extrabold text-[var(--accent-gold)]">
-              Rs. {product.price.toLocaleString()}
+            <div className="text-lg sm:text-xl font-bold text-[var(--accent-gold)] font-mono">
+              {formatPrice(product.price)}
             </div>
             {product.originalPrice && (
-              <span className="text-xs text-[var(--text-muted)] line-through block">
-                Rs. {product.originalPrice.toLocaleString()}
+              <span className="text-xs text-[var(--text-muted)] line-through block font-mono">
+                {formatPrice(product.originalPrice)}
               </span>
             )}
           </div>
@@ -170,7 +168,7 @@ export const ProductCard = ({ product }) => {
 
             <button
               onClick={() => addToCart(product, selectedColor)}
-              className="btn-gold px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-1.5"
+              className="btn-gold px-3.5 py-2 text-xs sm:text-sm font-bold flex items-center gap-1.5 rounded-xl shadow-md shadow-[#d4af37]/20"
               title="Add frame to bag"
             >
               <ShoppingBag className="w-4 h-4" />
@@ -182,4 +180,3 @@ export const ProductCard = ({ product }) => {
     </div>
   );
 };
-

@@ -3,17 +3,51 @@ import { PRODUCTS } from '../data/products';
 
 const StoreContext = createContext();
 
+export const CURRENCIES = {
+  PKR: { code: 'PKR', symbol: 'Rs. ', rate: 1, decimals: 0 },
+  USD: { code: 'USD', symbol: '$', rate: 1 / 278, decimals: 2 },
+  GBP: { code: 'GBP', symbol: '£', rate: 1 / 355, decimals: 2 },
+  EUR: { code: 'EUR', symbol: '€', rate: 1 / 302, decimals: 2 }
+};
+
 export const StoreProvider = ({ children }) => {
   // Navigation State
   const [activePage, setActivePage] = useState('home');
   const [selectedProductId, setSelectedProductId] = useState(null);
+
+  // Currency State with LocalStorage
+  const [currency, setCurrency] = useState(() => {
+    try {
+      const saved = localStorage.getItem('lumen_currency');
+      return saved && CURRENCIES[saved] ? saved : 'PKR';
+    } catch (_) {
+      return 'PKR';
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('lumen_currency', currency);
+    } catch (_) {}
+  }, [currency]);
+
+  // Price Formatter Helper across the whole app
+  const formatPrice = (pkrAmount) => {
+    if (pkrAmount === null || pkrAmount === undefined) return '';
+    const curr = CURRENCIES[currency] || CURRENCIES.PKR;
+    const converted = pkrAmount * curr.rate;
+    if (curr.decimals === 0) {
+      return `${curr.symbol}${Math.round(converted).toLocaleString()}`;
+    }
+    return `${curr.symbol}${converted.toFixed(curr.decimals)}`;
+  };
 
   // Cart & Wishlist State with LocalStorage
   const [cartItems, setCartItems] = useState(() => {
     try {
       const saved = localStorage.getItem('lumen_cart');
       return saved ? JSON.parse(saved) : [];
-    } catch (e) {
+    } catch (_) {
       return [];
     }
   });
@@ -22,7 +56,7 @@ export const StoreProvider = ({ children }) => {
     try {
       const saved = localStorage.getItem('lumen_wishlist');
       return saved ? JSON.parse(saved) : [];
-    } catch (e) {
+    } catch (_) {
       return [];
     }
   });
@@ -50,6 +84,7 @@ export const StoreProvider = ({ children }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const [isOrderTrackerOpen, setIsOrderTrackerOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [arProduct, setArProduct] = useState(null);
   const [prescriptionProduct, setPrescriptionProduct] = useState(null);
@@ -111,7 +146,7 @@ export const StoreProvider = ({ children }) => {
       }
     });
 
-    addToast(`Added "${product.name}" to cart!`, 'success');
+    addToast(`Added "${product.name}" to your bag`, 'success');
   };
 
   const updateQuantity = (key, delta) => {
@@ -130,7 +165,7 @@ export const StoreProvider = ({ children }) => {
 
   const removeFromCart = (key) => {
     setCartItems((prev) => prev.filter((item) => item.key !== key));
-    addToast('Item removed from cart', 'info');
+    addToast('Item removed from shopping bag', 'info');
   };
 
   const clearCart = () => {
@@ -146,7 +181,7 @@ export const StoreProvider = ({ children }) => {
         addToast(`Removed "${product.name}" from wishlist`, 'info');
         return prev.filter((p) => p.id !== product.id);
       } else {
-        addToast(`Added "${product.name}" to wishlist!`, 'success');
+        addToast(`Saved "${product.name}" to wishlist`, 'success');
         return [...prev, product];
       }
     });
@@ -159,21 +194,27 @@ export const StoreProvider = ({ children }) => {
   // Coupon application
   const applyPromo = (code) => {
     const trimmed = code.trim().toUpperCase();
-    if (trimmed === 'VISION20') {
-      setAppliedCoupon({ code: 'VISION20', percent: 20 });
-      addToast('Promo code VISION20 applied! 20% discount added.', 'success');
+    if (trimmed === 'PORTFOLIO20') {
+      setAppliedCoupon({ code: 'PORTFOLIO20', percent: 20 });
+      addToast('Special Portfolio 20% discount applied!', 'success');
+    } else if (trimmed === 'FIRST10') {
+      setAppliedCoupon({ code: 'FIRST10', percent: 10 });
+      addToast('Welcome 10% discount applied!', 'success');
+    } else if (trimmed === 'LUXURY15') {
+      setAppliedCoupon({ code: 'LUXURY15', percent: 15 });
+      addToast('Atelier 15% VIP discount applied!', 'success');
     } else if (trimmed === 'FREESHIP') {
-      setAppliedCoupon({ code: 'FREESHIP', percent: 10 });
-      addToast('Promo code FREESHIP applied!', 'success');
+      setAppliedCoupon({ code: 'FREESHIP', percent: 5, freeShipping: true });
+      addToast('Complimentary White-Glove Shipping applied!', 'success');
     } else {
-      addToast('Invalid coupon code. Try "VISION20".', 'error');
+      addToast('Invalid promo code. Try "PORTFOLIO20" or "FIRST10".', 'error');
     }
   };
 
   const removeCoupon = () => {
     setAppliedCoupon(null);
     setPromoCode('');
-    addToast('Coupon removed', 'info');
+    addToast('Promo discount removed', 'info');
   };
 
   // Computed Cart totals in PKR
@@ -189,8 +230,39 @@ export const StoreProvider = ({ children }) => {
     return Math.round((subtotal * appliedCoupon.percent) / 100);
   }, [subtotal, appliedCoupon]);
 
-  const shippingCost = subtotal >= 5000 || subtotal === 0 ? 0 : 250;
+  const shippingCost = (appliedCoupon && appliedCoupon.freeShipping) || subtotal >= 5000 || subtotal === 0 ? 0 : 250;
   const totalAmount = subtotal - discountAmount + shippingCost;
+
+  // Order Tracking State & Simulated Orders
+  const [trackedOrder, setTrackedOrder] = useState({
+    id: 'LMN-892144',
+    customer: 'Harris J.',
+    city: 'Lahore, PK',
+    date: '17 September 2026',
+    item: 'Apex Titanium Aviator (Gunmetal Gray)',
+    prescription: 'Single Vision Progressive • Carl Zeiss AR',
+    stage: 3, // 1: Order Confirmed, 2: Lens Surfacing, 3: Precision Glazing & QA, 4: Out for Courier
+    carrier: 'TCS Express White-Glove',
+    trackingNumber: 'TCS-90218841-PK',
+    estimatedDelivery: 'Tomorrow by 4:00 PM'
+  });
+
+  const trackOrder = (orderId) => {
+    const cleanId = orderId ? orderId.trim().toUpperCase() : 'LMN-892144';
+    setTrackedOrder({
+      id: cleanId,
+      customer: 'Atelier Client',
+      city: 'Boutique Dispatch',
+      date: 'Recent Order',
+      item: 'Bespoke Eyewear Frame',
+      prescription: 'Anti-Reflective Hydrophobic Coated Lenses',
+      stage: 3,
+      carrier: 'DHL Express / TCS Courier',
+      trackingNumber: `TRK-${Math.floor(10000000 + Math.random() * 90000000)}`,
+      estimatedDelivery: 'Within 2 business days'
+    });
+    setIsOrderTrackerOpen(true);
+  };
 
   // Filtered products calculation
   const filteredProducts = useMemo(() => {
@@ -253,7 +325,7 @@ export const StoreProvider = ({ children }) => {
     setSelectedColor('All');
     setPriceMax(40000);
     setSortBy('featured');
-    addToast('Filters reset to default', 'info');
+    addToast('Filters reset to default catalog', 'info');
   };
 
   return (
@@ -262,6 +334,9 @@ export const StoreProvider = ({ children }) => {
         activePage,
         navigateTo,
         selectedProductId,
+        currency,
+        setCurrency,
+        formatPrice,
         cartItems,
         addToCart,
         updateQuantity,
@@ -300,6 +375,11 @@ export const StoreProvider = ({ children }) => {
         setIsCheckoutOpen,
         isSizeGuideOpen,
         setIsSizeGuideOpen,
+        isOrderTrackerOpen,
+        setIsOrderTrackerOpen,
+        trackedOrder,
+        setTrackedOrder,
+        trackOrder,
         quickViewProduct,
         setQuickViewProduct,
         arProduct,

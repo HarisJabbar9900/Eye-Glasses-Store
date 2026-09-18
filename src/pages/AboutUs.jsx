@@ -22,17 +22,17 @@ export const AboutUs = () => {
         {/* Story Banner */}
         <div className="glass-panel p-8 sm:p-10 lg:p-12 rounded-3xl mb-12 sm:mb-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border border-[var(--border-color)] shadow-xl">
           <div className="lg:col-span-7">
-            <span className="text-cyan-400 text-xs font-bold tracking-widest uppercase block mb-2">✦ JAPAN &amp; ITALY CRAFTSMANSHIP</span>
+            <span className="text-[var(--accent-gold)] text-xs font-bold tracking-widest uppercase block mb-2">✦ BESPOKE OPTICAL CRAFTSMANSHIP</span>
             <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[var(--text-primary)] mb-4 font-serif leading-tight">
-              Handcrafted in Sabae &amp; Milan
+              Handcrafted With Surgical Precision
             </h3>
             <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed mb-6">
-              Every single frame undergoes over 120 meticulous hand-polishing and calibration steps. We source only Japanese beta-titanium and organic plant-based Italian Mazzucchelli acetate to create frames that are featherlight yet indestructible.
+              Every single frame undergoes over 120 meticulous hand-polishing and optical calibration steps. We engineer our eyewear with featherlight beta-titanium and organic plant-based bio-acetate to create frames that are ultra-light, highly resilient, and comfortable for all-day wear.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs sm:text-sm font-semibold text-[var(--accent-gold)]">
               <span className="flex items-center gap-2">✦ 100% Hypoallergenic Beta-Titanium</span>
-              <span className="flex items-center gap-2">✦ Organic Mazzucchelli Bio-Acetate</span>
-              <span className="flex items-center gap-2">✦ Zero-Distortion Carl Zeiss Lenses</span>
+              <span className="flex items-center gap-2">✦ Hand-Polished Bio-Acetate</span>
+              <span className="flex items-center gap-2">✦ Zero-Distortion Anti-Glare Lenses</span>
               <span className="flex items-center gap-2">✦ Sub-micron Laser Calibration</span>
             </div>
           </div>

@@ -79,7 +79,7 @@ export const HeroSlider = () => {
               onClick={() => setArProduct(filteredProducts[0] || null)}
               className="btn-outline text-sm sm:text-base py-3.5 px-6 bg-slate-950/60 backdrop-blur-md border-white/30 text-white hover:border-[#d4af37] hover:text-[#d4af37] flex items-center justify-center gap-2"
             >
-              <Camera className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" /> Virtual Fitting Studio
+              <Camera className="w-4 h-4 sm:w-5 sm:h-5 text-[#d4af37]" /> Virtual Fitting Studio
             </button>
           </div>
         </div>

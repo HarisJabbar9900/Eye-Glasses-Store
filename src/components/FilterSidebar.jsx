@@ -1,3 +1,8 @@
+import React from 'react';
+import { Filter, RotateCcw, X } from 'lucide-react';
+import { useStore } from '../context/StoreContext';
+import { CATEGORIES, FRAME_SHAPES, FRAME_MATERIALS, COLOR_OPTIONS } from '../data/products';
+
 export const FilterSidebar = ({ onClose }) => {
   const {
     selectedCategory,
@@ -13,11 +18,12 @@ export const FilterSidebar = ({ onClose }) => {
     priceMax,
     setPriceMax,
     resetFilters,
-    filteredProducts
+    filteredProducts,
+    formatPrice
   } = useStore();
 
   return (
-    <aside className="glass-panel p-6 rounded-3xl flex flex-col gap-6 w-full shadow-lg">
+    <aside className="glass-panel p-6 rounded-3xl flex flex-col gap-6 w-full shadow-lg border border-[var(--border-color)]">
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-[var(--border-color)]">
         <div className="flex items-center gap-2.5 font-bold text-lg text-[var(--text-primary)] font-serif">
@@ -91,7 +97,7 @@ export const FilterSidebar = ({ onClose }) => {
       <div>
         <div className="flex justify-between items-center mb-2.5 text-xs sm:text-sm">
           <span className="font-bold text-[var(--text-muted)] uppercase tracking-wider text-xs">Max Price</span>
-          <span className="text-[var(--accent-gold)] font-extrabold text-sm">Rs. {priceMax.toLocaleString()}</span>
+          <span className="text-[var(--accent-gold)] font-mono font-bold text-sm">{formatPrice(priceMax)}</span>
         </div>
         <input
           type="range"
@@ -102,9 +108,9 @@ export const FilterSidebar = ({ onClose }) => {
           onChange={(e) => setPriceMax(Number(e.target.value))}
           className="w-full accent-[var(--accent-gold)] cursor-pointer h-2 bg-slate-800 rounded-lg"
         />
-        <div className="flex justify-between text-xs text-[var(--text-muted)] mt-1.5">
-          <span>Rs. 3,000</span>
-          <span>Rs. 40,000</span>
+        <div className="flex justify-between text-xs text-[var(--text-muted)] mt-1.5 font-mono">
+          <span>{formatPrice(3000)}</span>
+          <span>{formatPrice(40000)}</span>
         </div>
       </div>
 
@@ -190,4 +196,3 @@ export const FilterSidebar = ({ onClose }) => {
     </aside>
   );
 };
-

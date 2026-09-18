@@ -15,7 +15,7 @@ const LENS_COATINGS = [
 ];
 
 export const PrescriptionModal = () => {
-  const { prescriptionProduct, setPrescriptionProduct, addToCart, setIsSizeGuideOpen } = useStore();
+  const { prescriptionProduct, setPrescriptionProduct, addToCart, setIsSizeGuideOpen, formatPrice } = useStore();
 
   const [selectedLensType, setSelectedLensType] = useState(LENS_TYPES[1]);
   const [selectedCoating, setSelectedCoating] = useState(LENS_COATINGS[1]);
@@ -55,7 +55,7 @@ export const PrescriptionModal = () => {
 
   return (
     <div className="fixed inset-0 w-screen h-screen bg-slate-950/85 backdrop-blur-md z-[1000] flex items-center justify-center p-3 sm:p-5 animate-fade-in">
-      <div className="glass-panel w-full max-w-3xl max-h-[92vh] rounded-3xl overflow-y-auto flex flex-col shadow-2xl bg-[var(--bg-primary)]">
+      <div className="glass-panel w-full max-w-3xl max-h-[92vh] rounded-3xl overflow-y-auto flex flex-col shadow-2xl bg-[var(--bg-primary)] border border-[var(--border-color)]">
         {/* Modal Header */}
         <div className="p-5 sm:p-6 border-b border-[var(--border-color)] flex items-center justify-between bg-slate-900/80 sticky top-0 z-10">
           <div className="flex items-center gap-3">
@@ -64,15 +64,15 @@ export const PrescriptionModal = () => {
             </div>
             <div>
               <h3 className="text-base sm:text-lg md:text-xl font-bold text-[var(--text-primary)] font-serif line-clamp-1">
-                Prescription Lens Customizer
+                Prescription Lens Atelier Customizer
               </h3>
               <span className="text-xs text-[var(--text-muted)] block">
-                Configuring: <strong className="text-[var(--accent-gold)]">{prescriptionProduct.name}</strong>
+                Configuring Frame: <strong className="text-[var(--accent-gold)]">{prescriptionProduct.name}</strong>
               </span>
             </div>
           </div>
 
-          <button onClick={() => setPrescriptionProduct(null)} className="btn-icon w-9 h-9 shrink-0">
+          <button onClick={() => setPrescriptionProduct(null)} className="btn-icon w-9 h-9 shrink-0 rounded-xl">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -82,7 +82,7 @@ export const PrescriptionModal = () => {
           {/* Step 1: Lens Usage Type */}
           <div>
             <h4 className="text-xs font-bold text-[var(--accent-gold)] uppercase tracking-wider mb-3">
-              1. Select Lens Type
+              1. Select Lens Configuration
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
@@ -102,8 +102,8 @@ export const PrescriptionModal = () => {
                     </div>
                     <p className="text-xs text-[var(--text-muted)] leading-relaxed">{lt.desc}</p>
                   </div>
-                  <div className="text-xs font-extrabold text-[var(--accent-gold)] mt-3 font-serif">
-                    +{lt.price === 0 ? 'FREE' : `Rs. ${lt.price.toLocaleString()}`}
+                  <div className="text-xs font-mono font-bold text-[var(--accent-gold)] mt-3">
+                    +{lt.price === 0 ? 'COMPLIMENTARY' : formatPrice(lt.price)}
                   </div>
                 </div>
               ))}
@@ -113,7 +113,7 @@ export const PrescriptionModal = () => {
           {/* Step 2: Lens Coating */}
           <div>
             <h4 className="text-xs font-bold text-[var(--accent-gold)] uppercase tracking-wider mb-3">
-              2. Choose Lens Tech Coating
+              2. Choose Optical Treatment &amp; Coating
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
@@ -133,15 +133,15 @@ export const PrescriptionModal = () => {
                     </div>
                     <p className="text-xs text-[var(--text-muted)] leading-relaxed">{lc.desc}</p>
                   </div>
-                  <div className="text-xs font-extrabold text-[var(--accent-gold)] mt-3 font-serif">
-                    +{lc.price === 0 ? 'FREE' : `Rs. ${lc.price.toLocaleString()}`}
+                  <div className="text-xs font-mono font-bold text-[var(--accent-gold)] mt-3">
+                    +{lc.price === 0 ? 'COMPLIMENTARY' : formatPrice(lc.price)}
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Step 3: Prescription Input (Manual or Upload) */}
+          {/* Step 3: Prescription Input */}
           {selectedLensType.id !== 'fashion' && (
             <div>
               <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
@@ -150,9 +150,9 @@ export const PrescriptionModal = () => {
                 </h4>
                 <button
                   onClick={() => setIsSizeGuideOpen(true)}
-                  className="text-cyan-400 text-xs flex items-center gap-1 hover:underline cursor-pointer bg-none border-none font-medium"
+                  className="text-[var(--accent-gold)] text-xs flex items-center gap-1 hover:underline cursor-pointer bg-none border-none font-medium"
                 >
-                  <HelpCircle className="w-3.5 h-3.5" /> Need size help?
+                  <HelpCircle className="w-3.5 h-3.5" /> Need Pupillary Distance (PD) guidance?
                 </button>
               </div>
 
@@ -167,7 +167,7 @@ export const PrescriptionModal = () => {
                       : 'border border-[var(--border-color)] text-[var(--text-secondary)]'
                   }`}
                 >
-                  Enter Sph / Cyl Manually
+                  Enter Values Manually
                 </button>
                 <button
                   type="button"
@@ -178,7 +178,7 @@ export const PrescriptionModal = () => {
                       : 'border border-[var(--border-color)] text-[var(--text-secondary)]'
                   }`}
                 >
-                  <Upload className="w-3.5 h-3.5" /> Upload Prescription
+                  <Upload className="w-3.5 h-3.5" /> Upload Optometrist Slip
                 </button>
               </div>
 
@@ -187,15 +187,15 @@ export const PrescriptionModal = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-center bg-[var(--bg-input)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
                     <span className="font-bold text-xs text-[var(--accent-gold)]">OD (Right Eye)</span>
                     <div>
-                      <label className="text-[10px] text-[var(--text-muted)] block font-medium">SPH</label>
+                      <label className="text-[10px] text-[var(--text-muted)] block font-medium">SPH (Sphere)</label>
                       <input type="text" value={odSph} onChange={(e) => setOdSph(e.target.value)} className="input-field py-1.5 px-2 text-xs" placeholder="-1.25" />
                     </div>
                     <div>
-                      <label className="text-[10px] text-[var(--text-muted)] block font-medium">CYL</label>
+                      <label className="text-[10px] text-[var(--text-muted)] block font-medium">CYL (Cylinder)</label>
                       <input type="text" value={odCyl} onChange={(e) => setOdCyl(e.target.value)} className="input-field py-1.5 px-2 text-xs" placeholder="-0.50" />
                     </div>
                     <div>
-                      <label className="text-[10px] text-[var(--text-muted)] block font-medium">AXIS</label>
+                      <label className="text-[10px] text-[var(--text-muted)] block font-medium">AXIS (°)</label>
                       <input type="text" value={odAxis} onChange={(e) => setOdAxis(e.target.value)} className="input-field py-1.5 px-2 text-xs" placeholder="90" />
                     </div>
                   </div>
@@ -203,21 +203,21 @@ export const PrescriptionModal = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-center bg-[var(--bg-input)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
                     <span className="font-bold text-xs text-[var(--accent-gold)]">OS (Left Eye)</span>
                     <div>
-                      <label className="text-[10px] text-[var(--text-muted)] block font-medium">SPH</label>
+                      <label className="text-[10px] text-[var(--text-muted)] block font-medium">SPH (Sphere)</label>
                       <input type="text" value={osSph} onChange={(e) => setOsSph(e.target.value)} className="input-field py-1.5 px-2 text-xs" placeholder="-1.50" />
                     </div>
                     <div>
-                      <label className="text-[10px] text-[var(--text-muted)] block font-medium">CYL</label>
+                      <label className="text-[10px] text-[var(--text-muted)] block font-medium">CYL (Cylinder)</label>
                       <input type="text" value={osCyl} onChange={(e) => setOsCyl(e.target.value)} className="input-field py-1.5 px-2 text-xs" placeholder="-0.25" />
                     </div>
                     <div>
-                      <label className="text-[10px] text-[var(--text-muted)] block font-medium">AXIS</label>
+                      <label className="text-[10px] text-[var(--text-muted)] block font-medium">AXIS (°)</label>
                       <input type="text" value={osAxis} onChange={(e) => setOsAxis(e.target.value)} className="input-field py-1.5 px-2 text-xs" placeholder="85" />
                     </div>
                   </div>
 
                   <div className="max-w-xs">
-                    <label className="text-xs text-[var(--text-primary)] font-bold block mb-1">Pupillary Distance (PD)</label>
+                    <label className="text-xs text-[var(--text-primary)] font-bold block mb-1">Pupillary Distance (PD in mm)</label>
                     <input type="text" value={pd} onChange={(e) => setPd(e.target.value)} className="input-field py-2 px-3 text-xs" placeholder="63 mm" />
                   </div>
                 </div>
@@ -237,7 +237,7 @@ export const PrescriptionModal = () => {
                     id="rx-upload"
                   />
                   <label htmlFor="rx-upload" className="btn-outline py-2 px-5 text-xs cursor-pointer inline-block rounded-xl font-bold">
-                    Choose File...
+                    Choose Prescription Slip...
                   </label>
                   {fileName && (
                     <div className="mt-3 text-xs text-emerald-400 font-bold">
@@ -253,15 +253,15 @@ export const PrescriptionModal = () => {
           <div className="p-5 bg-[var(--bg-input)] rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border border-[var(--border-color)]">
             <div>
               <div className="text-xs text-[var(--text-muted)]">
-                Frame (Rs. {prescriptionProduct.price.toLocaleString()}) + Lenses (Rs. {totalLensPrice.toLocaleString()})
+                Frame ({formatPrice(prescriptionProduct.price)}) + Lenses ({formatPrice(totalLensPrice)})
               </div>
-              <div className="text-xl sm:text-2xl font-extrabold text-[var(--accent-gold)] font-serif">
-                Total: Rs. {totalPrice.toLocaleString()}
+              <div className="text-xl sm:text-2xl font-bold text-[var(--accent-gold)] font-mono">
+                Total: {formatPrice(totalPrice)}
               </div>
             </div>
 
             <button onClick={handleAddToCart} className="btn-gold py-3 px-8 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 rounded-2xl shadow-lg shadow-[#d4af37]/25">
-              Confirm &amp; Add Lenses <ArrowRight className="w-4 h-4" />
+              Confirm &amp; Add Lenses to Bag <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>

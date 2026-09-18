@@ -11,6 +11,7 @@ import { QuickViewModal } from './components/QuickViewModal';
 import { SizeGuideModal } from './components/SizeGuideModal';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
+import { OrderTrackerModal } from './components/OrderTrackerModal';
 import { Toast } from './components/Toast';
 
 // Pages
@@ -72,6 +73,7 @@ const AppContent = () => {
       <SizeGuideModal />
       <CartDrawer />
       <CheckoutModal />
+      <OrderTrackerModal />
       <Toast />
     </div>
   );
